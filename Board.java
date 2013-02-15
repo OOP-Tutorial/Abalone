@@ -1,9 +1,16 @@
+class InvalidMove extends Exception{
+    public InvalidMove(){
+	System.out.println("Invalid move!");
+    }
+}
+
 interface Marble{
     int pos[][] = new int[14][4];
     int[] getPos(int i);//returns the position of marble number i
     void select(int i,int j);//selects a marble, also implements rulls for selection of more then 1 marble
-    void setPos(int i,int a,int b);//sets the position of a marble (implements rulls for which positions are available
-    void move(int i,int j);//moves the selected group, don't confuse it with setpos!!
+    void setPos(int i,int a,int b) throws InvalidMove;//sets the position of a marble (implements rulls for which positions are available
+    void move(int i,int j) throws InvalidMove;//moves the selected group, don't confuse it with setpos!!
+    void push(int i,int j) throws InvalidMove;
 }
 
 class WhiteMarbles implements Marble {
@@ -80,10 +87,10 @@ class WhiteMarbles implements Marble {
 	    }
 	}
     }//select is given the coordinates of a marble to be selected. It first checks if you can select more marbles, then it checks if the marble is of the correct kind and then it selects it.
-    public void setPos(int i,int a,int b){
+    public void setPos(int i,int a,int b) throws InvalidMove{
 	int p,q;
 	if(pos[i][2]==2)
-	    if(board.get(a,b)==0||board.get(a,b)==-2)
+	    if(board.get(a,b)!=-1)
 		if(Math.abs(pos[i][0]-a)<2&&a>=0&&a<=8&&Math.abs(pos[i][1]-b)<2&&b>=0&&b<=8)
 		    {
 			p=pos[i][0];
@@ -92,14 +99,15 @@ class WhiteMarbles implements Marble {
 			pos[i][1]=b;
 			pos[i][2]=0;
 			board.set(p,q,0);
+			board.set(a,b,-1);
 		    }
-		else System.out.println("Not a valid move!");
+		else throw new InvalidMove();
+	    else throw new InvalidMove();
+	else throw new InvalidMove();//System.out.println("Not a valid move!");
     }//setPos is given the number of a marble, it first checks if the marble is selected, then checks if the move is valid and then it makes the move.
-    public void move(int i,int j){
-	Board board=new Board(9,9);
-	if(board.get(i,j)==0){
+    public void move(int i,int j) throws InvalidMove{
+	try{
 	    int c=0;
-	    int a1=100,a2=100,a3=100;
 	    int[][] temp = new int[3][3];//holds position and number of marble
 	    for(int p=0;p<3;p++)
 		for(int q=0;q<2;q++)
@@ -119,7 +127,6 @@ class WhiteMarbles implements Marble {
 	    for(int p=0;p<3;p++){
 		if(temp[p][2]<14)
 		    if(Math.abs(temp[p][0]-i)==1&&Math.abs(temp[p][1]-j)==1||Math.abs(temp[p][0]-i)==0&&Math.abs(temp[p][1]-j)==1||Math.abs(temp[p][0]-i)==1&&Math.abs(temp[p][1]-j)==0){
-			System.out.println(temp[p][2]);
 			setPos(temp[p][2],i,j);
 			if(p==0){
 			    if(Math.abs(temp[p][0]-temp[p+1][0])<2&&Math.abs(temp[p][1]-temp[p+1][1])<2){//checks the position of the marble we want to move -> it could be between two marbles, on the most left part or on the most right part of the collection The logic behind the move is that I find the closest marble to the field where we want to move the group and do the move function recursively as seen ->. Please make some tests because I have a feeling it is going to fuck up if there are 2 marbles on the same distance from a field and do a random move or go into an infinite cycle ( I really don't have time to test right now sorry)
@@ -151,7 +158,30 @@ class WhiteMarbles implements Marble {
 		    }
 	    }
 	}
-	else System.out.println("Invalid move!!");
+	catch(InvalidMove e){}
+    }
+    public void push(int i, int j) throws InvalidMove{
+	BlackMarbles black=new BlackMarbles(9,9);
+	int c=0,d=0;
+	int x=9,y=9;
+	int[][] temp1 = new int[3][3];
+	int[][] temp2 = new int[3][3];
+	for(int p=0;p<3;p++)
+	    for(int q=0;q<3;q++)
+		{
+		    temp1[p][q]=-100;
+		    temp2[p][q]=-100;
+		}
+	for(int p=0;p<pos.length;p++)
+	    if(pos[p][2]==2){
+		temp1[c][0]=pos[p][0];
+		temp1[c][1]=pos[p][1];
+		temp1[c][2]=p;
+		if(c<2)
+		    c++;
+		else break;
+	    }
+	
     }
 }	
 class BlackMarbles implements Marble {
@@ -228,10 +258,10 @@ class BlackMarbles implements Marble {
 	    }
 	}
     }//select is given the coordinates of a marble to be selected. It first checks if you can select more marbles, then it checks if the marble is of the correct kind and then it selects it.
-    public void setPos(int i,int a,int b){
+    public void setPos(int i,int a,int b) throws InvalidMove{
 	int p,q;
 	if(pos[i][2]==2)
-	    if(board.get(a,b)==0||board.get(a,b)==-2)
+	    if(board.get(a,b)!=1)
 		if(Math.abs(pos[i][0]-a)<2&&a>=0&&a<=8&&Math.abs(pos[i][1]-b)<2&&b>=0&&b<=8)
 		    {
 			p=pos[i][0];
@@ -240,14 +270,15 @@ class BlackMarbles implements Marble {
 			pos[i][1]=b;
 			pos[i][2]=0;
 			board.set(p,q,0);
+			board.set(a,b,1);
 		    }
-		else System.out.println("Not a valid move!");
+		else throw new InvalidMove();
+	    else throw new InvalidMove();
+	else throw new InvalidMove();//System.out.println("Not a valid move!");
     }//setPos is given the number of a marble, it first checks if the marble is selected, then checks if the move is valid and then it makes the move.
-   public void move(int i,int j){
-       Board board=new Board(9,9);
-       if(board.get(i,j)==0){
+    public void move(int i,int j) throws InvalidMove{
+      try{
 	   int c=0;
-	   int a1=100,a2=100,a3=100;
 	   int[][] temp = new int[3][3];//holds position and number of marble
 	   for(int p=0;p<3;p++)
 	       for(int q=0;q<2;q++)
@@ -299,12 +330,13 @@ class BlackMarbles implements Marble {
 		   }
 	   }
        }
-       else System.out.println("Invalid move!!");
-   }
+      catch(InvalidMove e){}
+    }
+    public void push(int i,int j){} 
 }   
 
 public class Board{
-     private int board[][];
+    private int board[][];
     Board(int i, int j){
 	board = new int[i][j];
 	for(int p=0;p<i;p++)
@@ -346,7 +378,9 @@ public class Board{
 	/*test.setPos(4,4,2);
 	test.setPos(7,4,4);
 	test.setPos(10,5,5);*/
-	test.move(1,4);
+	try{
+	    test.move(1,4);}
+	catch(InvalidMove e){}
 	for(int i=0;i<14;i++)
 	if(i==4||i==7||i==10) System.out.println(test.getPos(i)[0]+" "+test.getPos(i)[1]+" "+i);
 	//System.out.println(test.getPos(0)[0]+" "+test.getPos(0)[1]+" "+test.getPos(0)[2]);
@@ -354,3 +388,5 @@ public class Board{
 	//System.out.println(test.getPos(0)[0]+" "+test.getPos(0)[1]+" "+test.getPos(0)[2]);
     }
 }
+
+//the number 14 everywhere really shouldn't be 14 but be some number n that is the number of marbles
