@@ -6,6 +6,7 @@ class InvalidMove extends Exception {
 
 interface Marble {
 	int pos[][] = new int[14][4];
+	Board board = new Board(9, 9);
 
 	int[] getPos(int i);// returns the position of marble number i
 
@@ -32,14 +33,20 @@ interface Marble {
 	void push(int i, int j) throws InvalidMove;
 
 	int firstmoved(int i, int j);
+
+	void refresh();
 }
 
 class WhiteMarbles implements Marble {
 	private int pos[][] = new int[14][4];
-	private Board board;
+	private int i;
+	private int j;
+
+	// private Board board;
 
 	WhiteMarbles(int i, int j) {
-		board = new Board(i, j);
+		this.i = i;
+		this.j = j;
 		int s = 0;
 		for (int p = 0; p < i; p++)
 			for (int q = 0; q < j; q++) {
@@ -51,6 +58,21 @@ class WhiteMarbles implements Marble {
 					s++;
 				}
 			}
+	}
+
+	public void refresh() {
+		int s = 0;
+		for (int p = 0; p < i; p++)
+			for (int q = 0; q < j; q++) {
+				if (board.get(p, q) == -1) {
+					pos[s][0] = p;
+					pos[s][1] = q;
+					pos[s][2] = 0;
+					pos[s][3] = -1;
+					s++;
+				}
+			}
+
 	}
 
 	public int[] getPos(int i) {
@@ -187,7 +209,8 @@ class WhiteMarbles implements Marble {
 				else
 					throw new InvalidMove();
 			else
-				throw new InvalidMove();// System.out.println("Not a valid move!");
+				throw new InvalidMove();
+		// System.out.println("Not a valid move!");
 	}// setPos is given the number of a marble, it first checks if the marble is
 		// selected, then checks if the move is valid and then it makes the
 		// move.
@@ -394,10 +417,10 @@ class WhiteMarbles implements Marble {
 
 	public void push(int i, int j) throws InvalidMove {
 		BlackMarbles black = new BlackMarbles(9, 9);
+		System.out.println("push called");
 		int closest = pos.length;
 		int c = 0;
-		int counter = 0;
-		int s = 0;
+		int s = 1;
 		int diff[][] = { { -9, -9 }, { -9, -9 }, { -9, -9 } };
 		int[] min = new int[2];
 		int[][] temp = new int[3][3];// holds position and number of marble
@@ -417,7 +440,7 @@ class WhiteMarbles implements Marble {
 					break;
 			}
 		closest = firstmoved(i, j);
-		for (int p = 0; p < c; p++) {
+		for (int p = 0; p <= c; p++) {
 			if (temp[p][2] == closest) {
 				if (p == 0) {
 					diff[0][0] = temp[p][0] - temp[p + 1][0];
@@ -437,57 +460,70 @@ class WhiteMarbles implements Marble {
 				}
 
 			}
-			for (int q = 0; q < c; q++) {
-				if (Math.abs(diff[q][0]) < 2 && Math.abs(diff[q][1]) < 2) {
-					min[0] = diff[q][0];
-					min[1] = diff[q][1];
-				}
+		}
+		for (int q = 0; q <= c; q++) {
+			if ((Math.abs(diff[q][0]) == 1 && Math.abs(diff[q][1]) == 0)
+					|| (Math.abs(diff[q][0]) == 1 && Math.abs(diff[q][1]) == 1)
+					|| (Math.abs(diff[q][0]) == 0 && Math.abs(diff[q][1]) == 1)) {
+				min[0] = diff[q][0];
+				min[1] = diff[q][1];
+			}
 
-			}
-			{
-				if (board.get(i + 1, j) == 1)
-					s++;
-				if (board.get(i + 1, j - 1) == 1)
-					s++;
-				if (board.get(i + 1, j + 1) == 1)
-					s++;
-				if (board.get(i, j + 1) == 1)
-					s++;
-				if (board.get(i, j - 1) == 1)
-					s++;
-				if (board.get(i - 1, j) == 1)
-					s++;
-				if (board.get(i - 1, j + 1) == 1)
-					s++;
-				if (board.get(i - 1, j - 1) == 1)
-					s++;
-			}
-			if (s < 2) {
-				if (c > counter) {
-					for (int q = 0; q < counter; q++)
-						black.select(diff[q][0] + i, diff[q][1] + j);
-					try {
-						black.move(c * min[0] + i, c * min[1] + j);
-					} catch (InvalidMove e) {
+		}
+		{
+			if (board.get(i + 1, j) == 1)
+				s++;
+			if (board.get(i + 1, j - 1) == 1)
+				s++;
+			if (board.get(i + 1, j + 1) == 1)
+				s++;
+			if (board.get(i, j + 1) == 1)
+				s++;
+			if (board.get(i, j - 1) == 1)
+				s++;
+			if (board.get(i - 1, j) == 1)
+				s++;
+			if (board.get(i - 1, j + 1) == 1)
+				s++;
+			if (board.get(i - 1, j - 1) == 1)
+				s++;
+		}
+		if (s < 3) {
+			if (c > s) {
+				for (int q = 0; q <= s; q++) {
+					if (Math.abs(diff[q][0]) < 3 && Math.abs(diff[q][1]) < 3) {
+						if (q == 1)
+							black.select(i, j);
+						else
+							black.select(diff[q][0] + i, diff[q][1] + j);
 					}
-					try {
-						move(i, j);
-					} catch (InvalidMove e) {
-					}
-				} else
-					throw new InvalidMove();
+				}
+				try {
+					black.move((c - 1) * min[0] + i, (c - 1) * min[1] + j);
+				} catch (InvalidMove e) {
+				}
+				try {
+					move(i, j);
+				} catch (InvalidMove e) {
+				}
 			} else
 				throw new InvalidMove();
-		}
+		} else
+			throw new InvalidMove();
 	}
 }
 
 class BlackMarbles implements Marble {
 	private int pos[][] = new int[14][4];
-	private Board board;
+	private int i;
+	private int j;
+
+	// private Board board;
 
 	BlackMarbles(int i, int j) {
-		board = new Board(i, j);
+		this.i = i;
+		this.j = j;
+		// board = new Board(i, j);
 		int s = 0;
 		for (int p = 0; p < i; p++)
 			for (int q = 0; q < j; q++) {
@@ -499,6 +535,21 @@ class BlackMarbles implements Marble {
 					s++;
 				}
 			}
+	}
+
+	public void refresh() {
+		int s = 0;
+		for (int p = 0; p < i; p++)
+			for (int q = 0; q < j; q++) {
+				if (board.get(p, q) == 1) {
+					pos[s][0] = p;
+					pos[s][1] = q;
+					pos[s][2] = 0;
+					pos[s][3] = 0;
+					s++;
+				}
+			}
+
 	}
 
 	public int[] getPos(int i) {
@@ -601,7 +652,8 @@ class BlackMarbles implements Marble {
 			else
 				throw new InvalidMove();
 		else
-			throw new InvalidMove();// System.out.println("Not a valid move!");
+			throw new InvalidMove();
+// System.out.println("Not a valid move!");
 	}// setPos is given the number of a marble, it first checks if the marble is
 		// selected, then checks if the move is valid and then it makes the
 		// move.
@@ -638,7 +690,6 @@ class BlackMarbles implements Marble {
 								&& Math.abs(temp[p][1] - j) == 1
 								|| Math.abs(temp[p][0] - i) == 1
 								&& Math.abs(temp[p][1] - j) == 0) {
-							System.out.println(temp[p][2]);
 							setPos(temp[p][2], i, j);
 							if (p == 0) {
 								if (Math.abs(temp[p][0] - temp[p + 1][0]) < 2
@@ -804,7 +855,6 @@ class BlackMarbles implements Marble {
 						}
 				}
 		} catch (InvalidMove e) {
-			return;
 		}
 	}
 
@@ -944,32 +994,83 @@ public class Board {
 	}
 
 	public static void main(String[] args) {
+		int s=0;
+		WhiteMarbles white = new WhiteMarbles(9, 9);
+		BlackMarbles black = new BlackMarbles(9, 9);
+		white.select(4,6);
+		white.select(4,7);
+		white.select(4,8);
+		black.select(4,1);
+		black.select(4,2);
+		try{
+		white.move(4,5);
+		black.move(4,3);} catch(InvalidMove e){}
+		for(int i=0;i<9;i++)
+			for(int j=0;j<9;j++)
+				if(Marble.board.get(i,j)==1){s++; System.out.println(i+" "+j+" "+s);}
+		/*white.select(4,5);
+		white.select(4,6);
+		white.select(4,7);
+		black.select(4,3);
+		black.select(4,2);
+		try{
+		black.move(4,4);
+		}catch(InvalidMove e){}
+		try{
+			white.move(4,4);
+		}catch(InvalidMove e){}
+		for(int i=0;i<9;i++)
+			for(int j=0;j<9;j++)
+				if(Marble.board.get(i,j)==1) System.out.println(i+" "+j);*/
+		/*white.select(3, 5);
+		white.select(2, 6);
+		for (int i = 0; i < 14; i++)
+			if (white.getPos(i)[2] == 2)
+				System.out.println(white.getPos(i)[0] + " "
+						+ white.getPos(i)[1] + " " + i + " White Selected");
+		black.select(5, 3);
+		for (int i = 0; i < 14; i++)
+			if (black.getPos(i)[2] == 2)
+				System.out.println(black.getPos(i)[0] + " "
+						+ black.getPos(i)[1] + " " + i + " Black Selected");
+		try {
+			black.move(4, 4);
+		} catch (InvalidMove e) {
+		}
+		for (int i = 0; i < 14; i++)
+			if (i == 4)
+				System.out.println(black.getPos(i)[0] + " "
+						+ black.getPos(i)[1] + " " + i + " Black Moved");
+		try {
+			white.move(4, 4);
+		} catch (InvalidMove e) {
+		}
+		for (int i = 0; i < 14; i++)
+			if (i == 6 || i == 7)
+				System.out.println(white.getPos(i)[0] + " "
+						+ white.getPos(i)[1] + " " + i + " White Moved");*/
+
+
 		/*
 		 * Board test = new Board(9,9); for(int i=0;i<9;i++) for(int
 		 * j=0;j<9;j++) if(test.get(i,j)==1) System.out.println(i+" "+j);
 		 * System.out.println(test.get(0,5));
 		 */
-		WhiteMarbles test = new WhiteMarbles(9, 9);
-		test.select(2, 4);
-		test.select(3, 5);
-		test.select(4, 6);
-		for (int i = 0; i < 14; i++)
-			if (test.getPos(i)[2] == 2)
-				System.out.println(test.getPos(i)[0] + " " + test.getPos(i)[1]
-						+ " " + i + " Selected");
 		/*
-		 * test.setPos(4,4,2); test.setPos(7,4,4); test.setPos(10,5,5);
+		 * WhiteMarbles test = new WhiteMarbles(9, 9); test.select(2, 4);
+		 * test.select(3, 5); test.select(4, 6); for (int i = 0; i < 14; i++) if
+		 * (test.getPos(i)[2] == 2) System.out.println(test.getPos(i)[0] + " " +
+		 * test.getPos(i)[1] + " " + i + " Selected"); /* test.setPos(4,4,2);
+		 * test.setPos(7,4,4); test.setPos(10,5,5);
 		 */
-		System.out.println(test.firstmoved(5, 6)
-				+ " is the first marlbe that will be moved");
-		try {
-			test.move(3, 4);
-		} catch (InvalidMove e) {
-		}
-		for (int i = 0; i < 14; i++)
-			if (i == 4 || i == 7 || i == 10)
-				System.out.println(test.getPos(i)[0] + " " + test.getPos(i)[1]
-						+ " " + i);
+		// System.out.println(test.firstmoved(5, 6)
+		// + " is the first marlbe that will be moved");
+		/*
+		 * try { test.move(3, 4); } catch (InvalidMove e) { } for (int i = 0; i
+		 * < 14; i++) if (i == 4 || i == 7 || i == 10)
+		 * System.out.println(test.getPos(i)[0] + " " + test.getPos(i)[1] + " "
+		 * + i);
+		 */
 		/*
 		 * test.select(1, 4); test.select(2, 4); test.select(3, 4); try {
 		 * test.move(0, 4); } catch (InvalidMove e) { } for (int i = 0; i < 14;
