@@ -212,7 +212,6 @@ class WhiteMarbles implements Marble {
 
 	public void setPos(int i, int a, int b) throws InvalidMove {
 		int p, q;
-		try {
 			if (pos[i][2] == 2)
 				if (board.get(a, b) != -1)
 					if (Math.abs(pos[i][0] - a) < 2 && a >= 0 && a <= 8
@@ -241,10 +240,8 @@ class WhiteMarbles implements Marble {
 				System.out.println(3);
 				throw new InvalidMove();}
 			// System.out.println("Not a valid move!");
-		} catch (ArrayIndexOutOfBoundsException e) {
-			pos[i][2] = -100;
-		}
-	} // setPos is given the number of a marble, it first checks if the marble
+		} 
+	 // setPos is given the number of a marble, it first checks if the marble
 		// is
 		// selected, then checks if the move is valid and then it makes the
 		// move.
@@ -269,13 +266,14 @@ class WhiteMarbles implements Marble {
 				else
 					break;
 			}
-		if (board.get(i, j) == 1) {
+		if (i >= 9 || j >= 9) {
+			int current = firstmoved(i, j);
+			pos[current][2] = -100;
+		} else if (board.get(i, j) == 1) {
 			push(i, j);
 		} else
 			for (int s = 0; s < 3; s++) {
 				if (temp[s][2] == closest) {
-					//System.out.printf("setting position of %d %d on %d %d \n",temp[s][0],temp[s][1],i,j);
-					//for(int p=0;p<14;p++){if(pos[p][2]==2) System.out.println(pos[p][0]+" "+pos[p][1]);}
 					setPos(temp[s][2], i, j);
 
 					board.print();
@@ -293,97 +291,6 @@ class WhiteMarbles implements Marble {
 			}
 		refresh();
 	}
-	/*public void move(int i, int j) throws InvalidMove {
-		if (i < 0 && j < 0)
-			return;
-		try {
-			int c = 0;
-			int[][] temp = new int[3][3];// holds position and number of marble
-			for (int p = 0; p < 3; p++)
-				for (int q = 0; q < 2; q++)
-					temp[p][q] = -100;
-			for (int p = 0; p < 3; p++)
-				temp[p][2] = 14;
-			for (int p = 0; p < 14; p++)
-				if (pos[p][2] == 2) {
-					temp[c][0] = pos[p][0];
-					temp[c][1] = pos[p][1];
-					temp[c][2] = p;
-					if (c < 2)
-						c++;
-					else
-						break;
-				}
-			if (board.get(i, j) == 1)
-				push(i, j);
-			else
-				for (int p = 0; p < 3; p++) {
-					if (temp[p][2] < 14)
-						if (Math.abs(temp[p][0] - i) == 1
-								&& Math.abs(temp[p][1] - j) == 1
-								|| Math.abs(temp[p][0] - i) == 0
-								&& Math.abs(temp[p][1] - j) == 1
-								|| Math.abs(temp[p][0] - i) == 1
-								&& Math.abs(temp[p][1] - j) == 0) {
-							setPos(temp[p][2], i, j);
-							if (p == 0) {
-								if (Math.abs(temp[p][0] - temp[p + 1][0]) < 2
-										&& Math.abs(temp[p][1] - temp[p + 1][1]) < 2) {
-									if (Math.abs(temp[p][0] - temp[p + 2][0]) < 2
-											&& Math.abs(temp[p][1]
-													- temp[p + 2][1]) < 2) {
-										move(temp[p + 1][0] - temp[p][0] + i,
-												temp[p + 1][1] - temp[p][1] + j);
-										move(temp[p + 2][0] - temp[p][0] + i,
-												temp[p + 2][1] - temp[p][1] + j);
-									} else
-										move(temp[p + 1][0] - temp[p][0] + i,
-												temp[p + 1][1] - temp[p][1] + j);
-								} else
-									move(temp[p + 2][0] - temp[p][0] + i,
-											temp[p + 2][1] - temp[p][1] + j);
-							}
-							if (p == 1) {
-								if (Math.abs(temp[p][0] - temp[p + 1][0]) < 2
-										&& Math.abs(temp[p][1] - temp[p + 1][1]) < 2) {
-									if (Math.abs(temp[p][0] - temp[p - 1][0]) < 2
-											&& Math.abs(temp[p][1]
-													- temp[p - 1][1]) < 2) {
-										move(temp[p + 1][0] - temp[p][0] + i,
-												temp[p + 1][1] - temp[p][1] + j);
-										move(temp[p - 1][0] - temp[p][0] + i,
-												temp[p - 1][1] - temp[p][1] + j);
-									} else
-										move(temp[p + 1][0] - temp[p][0] + i,
-												temp[p + 1][1] - temp[p][1] + j);
-								} else
-									move(temp[p - 1][0] - temp[p][0] + i,
-											temp[p - 1][1] - temp[p][1] + j);
-							}
-							if (p == 2) {
-								if (Math.abs(temp[p][0] - temp[p - 1][0]) < 2
-										&& Math.abs(temp[p][1] - temp[p - 1][1]) < 2) {
-									if (Math.abs(temp[p][0] - temp[p - 2][0]) < 2
-											&& Math.abs(temp[p][1]
-													- temp[p - 2][1]) < 2) {
-										move(temp[p - 1][0] - temp[p][0] + i,
-												temp[p - 1][1] - temp[p][1] + j);
-										move(temp[p - 2][0] - temp[p][0] + i,
-												temp[p - 2][1] - temp[p][1] + j);
-									} else
-										move(temp[p - 1][0] - temp[p][0] + i,
-												temp[p - 1][1] - temp[p][1] + j);
-								} else
-									move(temp[p - 2][0] - temp[p][0] + i,
-											temp[p - 2][1] - temp[p][1] + j);
-							}
-						}
-				}
-		} catch (InvalidMove e) {
-		}
-		refresh();
-		board.print();
-	}*/
 
 	public void push(int i, int j) throws InvalidMove {
 		System.out.println("push called");
@@ -623,7 +530,6 @@ class BlackMarbles implements Marble {
 	}// select is given the coordinates of a marble to be selected. It first
 		public void setPos(int i, int a, int b) throws InvalidMove {
 		int p, q;
-		try {
 			if (pos[i][2] == 2)
 				if (board.get(a, b) != 1)
 					if (Math.abs(pos[i][0] - a) < 2 && a >= 0 && a <= 8
@@ -644,158 +550,57 @@ class BlackMarbles implements Marble {
 			else{
 				board.set(pos[i][0], pos[i][1], 1);
 				throw new InvalidMove();}
-		} catch (ArrayIndexOutOfBoundsException e) {
-			pos[i][2] = -100;
-		}
-	}// setPos is given the number of a marble, it first checks if the marble is
+		} 
+	// setPos is given the number of a marble, it first checks if the marble is
 		// selected, then checks if the move is valid and then it makes the
 		// move.
 
-		public void move(int i, int j) throws InvalidMove {
-			try{
-			System.out.println("In black move");
-			int c = 0;
-			int closest = firstmoved(i, j);
-			int[][] temp = new int[3][3];// holds position and number of marble
-			for (int p = 0; p < 3; p++)
-				for (int q = 0; q < 2; q++)
-					temp[p][q] = -100;
-			for (int p = 0; p < 3; p++)
-				temp[p][2] = 14;
-			for (int p = 0; p < 14; p++)
-				if (pos[p][2] == 2) {
-					temp[c][0] = pos[p][0];
-					temp[c][1] = pos[p][1];
-					temp[c][2] = p;
-					if (c < 3)
-						c++;
-					else
-						break;
-				}
-			
-			if (board.get(i, j) == -1) {
-				push(i, j);
-			} else
-				for (int s = 0; s < 3; s++) {
-					if (temp[s][2] == closest) {
+	public void move(int i, int j) throws InvalidMove {
+		System.out.println("In black move");
+		int c = 0;
+		int closest = firstmoved(i, j);
+		int[][] temp = new int[3][3];// holds position and number of marble
+		for (int p = 0; p < 3; p++)
+			for (int q = 0; q < 2; q++)
+				temp[p][q] = -100;
+		for (int p = 0; p < 3; p++)
+			temp[p][2] = 14;
+		for (int p = 0; p < 14; p++)
+			if (pos[p][2] == 2) {
+				temp[c][0] = pos[p][0];
+				temp[c][1] = pos[p][1];
+				temp[c][2] = p;
+				if (c < 3)
+					c++;
+				else
+					break;
+			}
+		if (i >= 9 || j >= 9) {
+			int current = firstmoved(i, j);
+			pos[current][2] = -100;
+		} else if (board.get(i, j) == -1) {
+			push(i, j);
+		} else
+			for (int s = 0; s < 3; s++) {
+				if (temp[s][2] == closest) {
 
-						setPos(temp[s][2], i, j);
-						board.print();
-						if (c > 1) {
-							closest = firstmoved(temp[s][0], temp[s][1]);
-							for (int p = 0; p < 3; p++) {
-								if (temp[p][2] == closest) {
-									move(temp[p][0] - temp[s][0] + i, temp[p][1]
-											- temp[s][1] + j);
-								}
+					setPos(temp[s][2], i, j);
+					board.print();
+					if (c > 1) {
+						closest = firstmoved(temp[s][0], temp[s][1]);
+						for (int p = 0; p < 3; p++) {
+							if (temp[p][2] == closest) {
+								move(temp[p][0] - temp[s][0] + i, temp[p][1]
+										- temp[s][1] + j);
 							}
 						}
-						break;
 					}
-				}
-			refresh();
-			}
-			catch(ArrayIndexOutOfBoundsException e){
-				int current=firstmoved(i,j);
-				System.out.println(current);
-				pos[current][2]=-100;
-				for(int q=0;q<14;q++){
-					System.out.printf("%d %d %d %d\n",pos[q][0],pos[q][1],pos[q][2],q);
+					break;
 				}
 			}
-		}
-	/*public void move(int i, int j) throws InvalidMove {
-		if (i < 0 && j < 0)
-			return;
-		System.out.println("move called");
-		try {
-			int c = 0;
-			int[][] temp = new int[3][3];// holds position and number of marble
-			for (int p = 0; p < 3; p++)
-				for (int q = 0; q < 2; q++)
-					temp[p][q] = -100;
-			for (int p = 0; p < 3; p++)
-				temp[p][2] = 14;
-			for (int p = 0; p < 14; p++)
-				if (pos[p][2] == 2) {
-					temp[c][0] = pos[p][0];
-					temp[c][1] = pos[p][1];
-					temp[c][2] = p;
-					if (c < 2)
-						c++;
-					else
-						break;
-				}
-			if (board.get(i, j) == -1){
-				push(i, j);}
-			else
-				for (int p = 0; p < 3; p++) {
-					if (temp[p][2] < 14)
-						if (Math.abs(temp[p][0] - i) == 1
-								&& Math.abs(temp[p][1] - j) == 1
-								|| Math.abs(temp[p][0] - i) == 0
-								&& Math.abs(temp[p][1] - j) == 1
-								|| Math.abs(temp[p][0] - i) == 1
-								&& Math.abs(temp[p][1] - j) == 0) {
-							setPos(temp[p][2], i, j);
-							if (p == 0) {
-								if (Math.abs(temp[p][0] - temp[p + 1][0]) < 2
-										&& Math.abs(temp[p][1] - temp[p + 1][1]) < 2) {
-									if (Math.abs(temp[p][0] - temp[p + 2][0]) < 2
-											&& Math.abs(temp[p][1]
-													- temp[p + 2][1]) < 2) {
-										move(temp[p + 1][0] - temp[p][0] + i,
-												temp[p + 1][1] - temp[p][1] + j);
-										move(temp[p + 2][0] - temp[p][0] + i,
-												temp[p + 2][1] - temp[p][1] + j);
-									} else
-										move(temp[p + 1][0] - temp[p][0] + i,
-												temp[p + 1][1] - temp[p][1] + j);
-								} else
-									move(temp[p + 2][0] - temp[p][0] + i,
-											temp[p + 2][1] - temp[p][1] + j);
-							}
-							if (p == 1) {
-								if (Math.abs(temp[p][0] - temp[p + 1][0]) < 2
-										&& Math.abs(temp[p][1] - temp[p + 1][1]) < 2) {
-									if (Math.abs(temp[p][0] - temp[p - 1][0]) < 2
-											&& Math.abs(temp[p][1]
-													- temp[p - 1][1]) < 2) {
-										move(temp[p + 1][0] - temp[p][0] + i,
-												temp[p + 1][1] - temp[p][1] + j);
-										move(temp[p - 1][0] - temp[p][0] + i,
-												temp[p - 1][1] - temp[p][1] + j);
-									} else
-										move(temp[p + 1][0] - temp[p][0] + i,
-												temp[p + 1][1] - temp[p][1] + j);
-								} else
-									move(temp[p - 1][0] - temp[p][0] + i,
-											temp[p - 1][1] - temp[p][1] + j);
-							}
-							if (p == 2) {
-								if (Math.abs(temp[p][0] - temp[p - 1][0]) < 2
-										&& Math.abs(temp[p][1] - temp[p - 1][1]) < 2) {
-									if (Math.abs(temp[p][0] - temp[p - 2][0]) < 2
-											&& Math.abs(temp[p][1]
-													- temp[p - 2][1]) < 2) {
-										move(temp[p - 1][0] - temp[p][0] + i,
-												temp[p - 1][1] - temp[p][1] + j);
-										move(temp[p - 2][0] - temp[p][0] + i,
-												temp[p - 2][1] - temp[p][1] + j);
-									} else
-										move(temp[p - 1][0] - temp[p][0] + i,
-												temp[p - 1][1] - temp[p][1] + j);
-								} else
-									move(temp[p - 2][0] - temp[p][0] + i,
-											temp[p - 2][1] - temp[p][1] + j);
-							}
-						}
-				}
-		} catch (InvalidMove e){
-		}
 		refresh();
-		board.print();
-	}*/
+	}
+
 
 	public void push(int i, int j) throws InvalidMove {
 		WhiteMarbles white = new WhiteMarbles(9, 9);
@@ -853,20 +658,6 @@ class BlackMarbles implements Marble {
 		}
 		if(board.get(min[0]+i,min[1]+1)==1)
 			s++;
-		/*{
-			if (board.get(i + 1, j) == -1)
-				s++;
-
-			if (board.get(i, j + 1) == -1)
-				s++;
-
-			if (board.get(i, j - 1) == -1)
-				s++;
-
-			if (board.get(i - 1, j) == -1)
-				s++;
-
-		}*/
 		if (s < 3) {
 			if (c >= s) {
 				for (int q = 0; q <= c; q++) {
@@ -999,6 +790,11 @@ public class Board {
 		for(int i=0;i<14;i++){
 			System.out.printf("%d %d %d %d\n",black.getPos(i)[0],black.getPos(i)[1],black.getPos(i)[2],i);
 		}
+		white.select(5,6);
+		white.select(6,7);
+		white.select(7,8);
+		try{white.move(4, 5);}
+		catch(InvalidMove e){}
 		
 	/*	white.select(4, 6);
 		white.select(4, 7);
