@@ -9,12 +9,12 @@ interface Marble {
 
 	int[] getPos(int i);// returns the position of marble number i
 
-	void select(int i, int j);// selects a marble, also implements rulls for
+	void select(int i, int j);// selects a marble, also implements rules for
 								// selection of more then 1 marble
 	
 	void setPos(int i, int a, int b) throws InvalidMove;// sets the position of
 														// a marble (implements
-														// rulls for which
+														// rules for which
 														// positions are
 														// available
 
@@ -212,10 +212,15 @@ class WhiteMarbles implements Marble {
 
 	public void setPos(int i, int a, int b) throws InvalidMove {
 		int p, q;
-			if (pos[i][2] == 2)
-				if (board.get(a, b) != -1)
-					if (Math.abs(pos[i][0] - a) < 2 && a >= 0 && a <= 8
-							&& Math.abs(pos[i][1] - b) < 2 && b >= 0 && b <= 8 && (Math.abs(pos[i][0] - a)+Math.abs(pos[i][1] - b))<=2) {
+		if (pos[i][2] == 2)
+			if (board.get(a, b) != -1)
+				if (Math.abs(pos[i][0] - a) < 2
+						&& a >= 0
+						&& a <= 8
+						&& Math.abs(pos[i][1] - b) < 2
+						&& b >= 0
+						&& b <= 8)
+					if (Math.abs(pos[i][0] - a + pos[i][1] - b) != 0) {
 						p = pos[i][0];
 						q = pos[i][1];
 						pos[i][0] = a;
@@ -223,24 +228,29 @@ class WhiteMarbles implements Marble {
 						pos[i][2] = 0;
 						board.set(p, q, 0);
 						board.set(a, b, -1);
-					} else{
+					} else {
 						board.set(pos[i][0], pos[i][1], -1);
-						System.out.println(1);
 						throw new InvalidMove();
-						} // stays commeted until I
-													// figure a
-				// way to fix it to throw errors when the move is really not
-				// valid
-				else{
+					}
+				else {
 					board.set(pos[i][0], pos[i][1], -1);
-					System.out.println(2);
-					throw new InvalidMove();}
-			else{
+					throw new InvalidMove();
+				} // stays commeted until I
+					// figure a
+			// way to fix it to throw errors when the move is really not
+			// valid
+			else {
 				board.set(pos[i][0], pos[i][1], -1);
-				System.out.println(3);
-				throw new InvalidMove();}
-			// System.out.println("Not a valid move!");
-		} 
+				throw new InvalidMove();
+			}
+		else {
+			board.set(pos[i][0], pos[i][1], -1);
+			System.out.println(3);
+			throw new InvalidMove();
+		}
+		// System.out.println("Not a valid move!");
+	}
+
 	 // setPos is given the number of a marble, it first checks if the marble
 		// is
 		// selected, then checks if the move is valid and then it makes the
@@ -750,51 +760,11 @@ public class Board {
 		int s = 0;
 		WhiteMarbles white = new WhiteMarbles(9, 9);
 		BlackMarbles black = new BlackMarbles(9, 9);
-		white.select(3,5);
-		white.select(4,6);
+		//white.select(2,4);
 		white.select(2,4);
 		try{
-		white.move(5,6);}
-		catch(InvalidMove e){}
-		black.select(6,4);
-		try{
-		black.move(6, 5);}
-		catch(InvalidMove e){}
-		black.select(6,5);
-		try{
-			black.move(6, 6);}
-			catch(InvalidMove e){}
-		black.select(6,6);
-		try{
-			black.move(6,7);
+			white.move(3, 3);	
 		}catch(InvalidMove e){}
-		black.select(6, 7);
-		try{
-			black.move(7, 8);
-		}catch(InvalidMove e){}
-
-		white.select(3,4);
-		white.select(4,5);
-		white.select(5,6);
-		try{
-			white.move(6,7);
-		}
-		catch(InvalidMove e){}
-		white.select(4,5);
-		white.select(5,6);
-		white.select(6,7);
-		try{
-			white.move(7, 8);	
-		}
-		catch(InvalidMove e){}
-		for(int i=0;i<14;i++){
-			System.out.printf("%d %d %d %d\n",black.getPos(i)[0],black.getPos(i)[1],black.getPos(i)[2],i);
-		}
-		white.select(5,6);
-		white.select(6,7);
-		white.select(7,8);
-		try{white.move(4, 5);}
-		catch(InvalidMove e){}
 		
 	/*	white.select(4, 6);
 		white.select(4, 7);
@@ -842,4 +812,4 @@ public class Board {
 // write a method that if there is an error issued returns all marbles to their
 // original places!!
 // try and fix select method but for now it isn't that important
-//As of now push calls the oposing move twice MUST FIX THIS IN THE MORNING!!!!
+
