@@ -1,3 +1,7 @@
+import java.awt.*;
+import javax.swing.*;
+import java.awt.event.*;
+
 class InvalidMove extends Exception {
 	public InvalidMove() {
 		System.out.println("Invalid move!");
@@ -285,8 +289,14 @@ class WhiteMarbles implements Marble {
 			for (int s = 0; s < 3; s++) {
 				if (temp[s][2] == closest) {
 					setPos(temp[s][2], i, j);
-
-					board.print();
+					JFrame frame = new JFrame();
+					frame.setTitle("Abalone");
+					frame.setSize(900, 900);
+					Container contentPane = frame.getContentPane();
+				        contentPane.add(new DrawBoard(board));
+					frame.show();
+					frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+					//board.print();
 					if (c > 1) {
 						closest = firstmoved(temp[s][0], temp[s][1]);
 						for (int p = 0; p < 3; p++) {
@@ -357,7 +367,7 @@ class WhiteMarbles implements Marble {
 			}
 
 		}
-		if(board.get(min[0]+i,min[1]+1)==1)
+		if(board.get(min[0]+i,min[1]+j)==1)
 			s++;
 
 		if (s < 3) {
@@ -375,11 +385,12 @@ class WhiteMarbles implements Marble {
 					}
 				}
 				try {
-					black.move((s) * min[0] + i, (s) * min[1] + j);
+				//System.out.printf("%d %d",(s), (s) * min[1]);
+				    black.move((s) * min[0] + i, (s) * min[1] + j);
 				} catch (InvalidMove e) {
 				}
 				try {
-					move(i, j);
+				    move(i, j);
 				} catch (InvalidMove e) {
 				}
 			} else
@@ -593,9 +604,15 @@ class BlackMarbles implements Marble {
 		} else
 			for (int s = 0; s < 3; s++) {
 				if (temp[s][2] == closest) {
-
-					setPos(temp[s][2], i, j);
-					board.print();
+				    setPos(temp[s][2], i, j);
+				    JFrame frame = new JFrame();
+				    frame.setTitle("Abalone");
+				    frame.setSize(900, 900);
+				    Container contentPane = frame.getContentPane();
+				    contentPane.add(new DrawBoard(board));
+				    frame.show();
+				    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+				    // board.print();
 					if (c > 1) {
 						closest = firstmoved(temp[s][0], temp[s][1]);
 						for (int p = 0; p < 3; p++) {
@@ -666,7 +683,7 @@ class BlackMarbles implements Marble {
 			}
 
 		}
-		if(board.get(min[0]+i,min[1]+1)==1)
+		if(board.get(min[0]+i,min[1]+j)==1)
 			s++;
 		if (s < 3) {
 			if (c >= s) {
@@ -763,7 +780,32 @@ public class Board {
 		//white.select(2,4);
 		white.select(2,4);
 		try{
-			white.move(3, 3);	
+			white.move(3,4);	
+		}catch(InvalidMove e){}
+
+		black.select(4,2);
+		black.select(5,2);
+		black.select(6,2);
+		try{
+		    black.move(3,2);
+		}catch(InvalidMove e){}
+
+		white.select(3,4);
+		white.select(3,5);
+		white.select(3,6);
+		try{
+		    white.move(3,3);
+		}catch(InvalidMove e){}
+		black.select(3,0);
+		try{
+		    black.move(3,1);
+		}catch(InvalidMove e){}
+
+		white.select(3,3);
+		white.select(3,4);
+		white.select(3,5);
+		try{
+		    white.move(3,2);
 		}catch(InvalidMove e){}
 		
 	/*	white.select(4, 6);
