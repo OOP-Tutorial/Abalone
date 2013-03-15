@@ -1,11 +1,11 @@
-package myAbalone.org;
+package org;
 
 
 import java.util.*;
 
 public class Trainer {
 
-      static long BEGIN;	// Time
+    	static long BEGIN;	// Time
     	LinkedList<Candidate> population = new LinkedList<Candidate>();
     	final Random rand;
     	

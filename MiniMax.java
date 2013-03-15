@@ -1,4 +1,4 @@
-package myAbalone.org;
+package org;
 
 import java.util.ArrayList;
 
@@ -9,7 +9,7 @@ class MiniMax{
     private float[] weight = {1,1,1,1,1,1,1};
     
     public MiniMax(float[] w){
-    this.weight = w;
+	this.weight = w;
     }
     public float[] getWeights(){
 	return this.weight;
@@ -17,7 +17,7 @@ class MiniMax{
     public void setWeights(float[] w){
 	this.weight = w;
     }
-    public int eval(Board board, int player){
+    public int eval(BoardAI board, int player){
       int result = 0;
       result += this.getWeights()[0]*gameResult(board, player);
       result += this.getWeights()[1]*marbles(board, player);
@@ -28,7 +28,7 @@ class MiniMax{
       result += this.getWeights()[6]*attack(board, (3 - player));
       return result;
     }
-    public int[] nextMove(Board board, int player){
+    public int[] nextMove(BoardAI board, int player){
             ArrayList<int[]> moves = board.getMoves(player);
             int[] values = new int[moves.size()];
             for(int i = 0; i < moves.size();i++){
@@ -39,7 +39,7 @@ class MiniMax{
             int best = maxInt(values);
             return moves.get(best);
     }
-    public int max(Board board, int depth, int player){
+    public int max(BoardAI board, int depth, int player){
         if(depth == 0 || board.getMarbles(1).size() == 8 || board.getMarbles(2).size() == 8){
           return eval(board, player);
         }
@@ -55,7 +55,7 @@ class MiniMax{
         }
     }
         
-    public int min(Board board, int depth, int player){
+    public int min(BoardAI board, int depth, int player){
         if(depth == 0 || board.getMarbles(1).size() == 8 || board.getMarbles(2).size() == 8){
           return eval(board, player);
         }
@@ -91,7 +91,7 @@ class MiniMax{
 	     }
 	return max;  
     }
-    public int gameResult(Board board, int player){
+    public int gameResult(BoardAI board, int player){
         if(board.getMarbles(player).size() == 8){
             return Integer.MIN_VALUE;
         }
@@ -102,17 +102,17 @@ class MiniMax{
             return 0;
         }
     }
-    public int marbles(Board board, int player){
+    public int marbles(BoardAI board, int player){
         return board.getMarbles(player).size();
     }
-    public float centreDistance(Board board, int player){
+    public float centreDistance(BoardAI board, int player){
 	float distance = 0;
 	for(int[] cood : board.getMarbles(player)){
 	    distance += Math.sqrt((cood[0] - 4)*(cood[0] - 4) + (cood[1] - 4)*(cood[1] - 4));
 	}
         return distance;
     }
-    public int grouping(Board board, int player){
+    public int grouping(BoardAI board, int player){
 	int g = 0;
         for(int[] marble : board.getMarbles(player)){
             for(int[] d : board.dir){
@@ -123,7 +123,7 @@ class MiniMax{
         }
         return g;
     }
-    public int attack(Board board, int player){
+    public int attack(BoardAI board, int player){
 	int att = 0;
         for(int[] move : board.getLineMoves(player)){
             if(board.getBoard()[move[2] + move[4]][move[1] + move[3]] == player && board.getBoard()[move[2] + 2*move[4]][move[1] + 2 * move[3]] == 3 - player){
