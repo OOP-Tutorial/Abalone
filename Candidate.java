@@ -1,4 +1,4 @@
-package myAbalone.org;
+package org;
 
 import java.util.*;
 public class Candidate implements Comparable<Candidate> {
@@ -7,7 +7,7 @@ public class Candidate implements Comparable<Candidate> {
     private Random rand;
 
     public Candidate() {
-  genotype = new float[SIZE];	
+	genotype = new float[SIZE];	
 	rand = new Random();
     }
 
@@ -32,7 +32,7 @@ public class Candidate implements Comparable<Candidate> {
     }
     public int stageGame(){
 	int res = 0;
-	Board b = new Board();
+	BoardAI b = new BoardAI();
 	MiniMax me = new MiniMax(this.genotype);
 	while(b.getMarbles(1).size() > 8 && b.getMarbles(2).size() > 8){
 	    if( b.isPossibleMove(m, b.getCPlayer())){
